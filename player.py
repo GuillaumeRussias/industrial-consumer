@@ -19,12 +19,12 @@ class Player:
         
         # TO DO:
         # implement your policy here to return the load charged / discharged in the battery
-        # below is a simple example  
-            
-        if time>10 and time<32:
-            return -10
+        if time == 0:
+            return(80)
+        if self.demand[time-1]*self.dt < self.battery_stock[time-1]:
+            return 0
         else:
-            return +20
+            return self.demand[time-1] - self.battery_stock[time-1]/self.dt
 
     def update_battery_stock(self,time,load):
         
