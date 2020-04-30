@@ -16,7 +16,7 @@ class Player:
         self.imbalance=[]
 
     def take_decision(self,time):
-        
+        return 0
         # TO DO:
         # implement your policy here to return the load charged / discharged in the battery
         if time == 0:
