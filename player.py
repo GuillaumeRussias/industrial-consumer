@@ -11,27 +11,36 @@ class Player:
         self.load= np.zeros(48) # chargement de la batterie (li)
         self.battery_stock = np.zeros(49) #a(t)
         self.capacity = 100
-        self.max_load = 100
-        self.prices = {"internal" : [],"external_purchase" : [],"external_sale" : []}
-        self.imbalance=[]
+        self.pmax = 100
+        self.prices = {"purchase" : [],"sale" : []}
+        self.imbalance={"purchase_cover":[], "sale_cover": []}
 
     def take_decision(self,time):
-        return 0
+        
         # TO DO:
-        # implement your policy here to return the load charged / discharged in the battery
-        if time == 0:
+        # implement your policy here to return the load charged / discharged in the battery between -pmax and pmax
+        # below is a simple example  
+            
+        if time>10 and time<32:
+            if self.prices["purchase"][time-1] < 0.06:
+                return +20a
+            else :
+                return +10                    
+        else:
+            return +15
+        """if time == 0:
             return(80)
         if self.demand[time-1]*self.dt < self.battery_stock[time-1]:
             return 0
         else:
-            return self.demand[time-1] - self.battery_stock[time-1]/self.dt
+            return self.demand[time-1] - self.battery_stock[time-1]/self.dt"""
 
     def update_battery_stock(self,time,load):
         
         #If the battery isn't enough powerful, the battery load is set to the battery maximum power.
 
-            if abs(load) > self.max_load:
-                load = self.max_load*np.sign(load) 
+            if abs(load) > self.pmax:
+                load = self.pmax*np.sign(load) 
             new_stock = self.battery_stock[time] + (self.efficiency*max(0,load) - 1/self.efficiency * max(0,-load))*self.dt
             
         #If the battery isn't full enough to provide such amount of electricity, 
@@ -62,11 +71,11 @@ class Player:
     def observe(self, t, demand, price, imbalance):
         self.demand.append(demand)
         
-        self.prices["internal"].append(price["internal"])
-        self.prices["external_sale"].append(price["external_sale"])
-        self.prices["external_purchase"].append(price["external_purchase"])
-        
-        self.imbalance.append(imbalance)
+        self.prices["purchase"].append(price["purchase"])
+        self.prices["sale"].append(price["sale"])
+
+        self.imbalance["purchase_cover"].append(imbalance["purchase_cover"])
+        self.imbalance["sale_cover"].append(imbalance["sale_cover"])
         
     
     def reset(self):
@@ -78,6 +87,5 @@ class Player:
         self.battery_stock[0] = last_bat
         
         self.demand=[]
-        self.prices = {"internal" : [],"external_purchase" : [],"external_sale" : []}
-        self.imbalance=[]
-    
+        self.prices = {"purchase" : [],"sale" : []}
+        self.imbalance={"purchase_cover":[], "sale_cover": []}
