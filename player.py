@@ -21,23 +21,32 @@ class Player:
         # implement your policy here to return the load charged / discharged in the battery between -pmax and pmax
         # below is a simple example 
         
-        if time==0:
+        if time==0 or time==1:
             return self.pmax
         
         p_battery_discharge=-min(self.battery_stock[time]/self.dt,self.pmax)
         p_battery_charge=min((self.capacity-self.battery_stock[time])/self.dt,self.pmax)
         
-        Purchase_limit=np.linspace(0.5,1,10)
-        for purchase_limit in Purchase_limit:
+        derive_prix=(self.prices["purchase"][time-1]-self.prices["purchase"][time-2])/self.dt
+        
+        purchase_limit=0.9
+        if self.imbalance["purchase_cover"][time-1]>=purchase_limit and time<40: #il y'a plus d'offre que de demande
+        #on rempli le plus possible la batterie
+            return p_battery_charge*self.imbalance["purchase_cover"][time-1]
+        
+        if self.imbalance["purchase_cover"][time-1]<=1-purchase_limit: #il y'a moins d'offre que de demande
+        #on vide le plus possible la batterie
+            return p_battery_discharge*self.imbalance["purchase_cover"][time-1]
+        
+        if time<=12:
+            return p_battery_charge
+        if derive_prix>0 and time<40:
+            return p_battery_discharge*0.5
+        if derive_prix<0 and time<40:
+            return p_battery_charge*self.imbalance["purchase_cover"][time-1]
+        
+        return p_battery_discharge
             
-            if self.imbalance["purchase_cover"][time-1]>=purchase_limit: #il y'a plus d'offre que de demande
-            #on rempli le plus possible la batterie
-                return p_battery_charge*self.imbalance["purchase_cover"][time-1]
-            
-            if self.imbalance["purchase_cover"][time-1]<=1-purchase_limit: #il y'a moins d'offre que de demande
-            #on vide le plus possible la batterie
-                return p_battery_discharge*self.imbalance["purchase_cover"][time-1]
-    
         
     def update_battery_stock(self,time,load):
         
