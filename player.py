@@ -19,22 +19,26 @@ class Player:
         
         # TO DO:
         # implement your policy here to return the load charged / discharged in the battery between -pmax and pmax
-        # below is a simple example  
+        # below is a simple example 
+        
+        if time==0:
+            return self.pmax
+        
+        p_battery_discharge=-min(self.battery_stock[time]/self.dt,self.pmax)
+        p_battery_charge=min((self.capacity-self.battery_stock[time])/self.dt,self.pmax)
+        
+        Purchase_limit=np.linspace(0.5,1,10)
+        for purchase_limit in Purchase_limit:
             
-        if time>10 and time<32:
-            if self.prices["purchase"][time-1] < 0.06:
-                return +20a
-            else :
-                return +10                    
-        else:
-            return +15
-        """if time == 0:
-            return(80)
-        if self.demand[time-1]*self.dt < self.battery_stock[time-1]:
-            return 0
-        else:
-            return self.demand[time-1] - self.battery_stock[time-1]/self.dt"""
-
+            if self.imbalance["purchase_cover"][time-1]>=purchase_limit: #il y'a plus d'offre que de demande
+            #on rempli le plus possible la batterie
+                return p_battery_charge*self.imbalance["purchase_cover"][time-1]
+            
+            if self.imbalance["purchase_cover"][time-1]<=1-purchase_limit: #il y'a moins d'offre que de demande
+            #on vide le plus possible la batterie
+                return p_battery_discharge*self.imbalance["purchase_cover"][time-1]
+    
+        
     def update_battery_stock(self,time,load):
         
         #If the battery isn't enough powerful, the battery load is set to the battery maximum power.
