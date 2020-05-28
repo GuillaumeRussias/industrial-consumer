@@ -40,7 +40,7 @@ class Player:
         #on vide le plus possible la batterie
             return p_battery_discharge*self.imbalance["purchase_cover"][time-1]
         
-        if time<=12:
+        if time<=10:
             return p_battery_charge
         if derive_prix>0 and time<40:
             return p_battery_discharge*0.5
