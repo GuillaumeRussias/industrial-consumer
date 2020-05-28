@@ -9,6 +9,8 @@ class Player:
         self.demand=[]
         self.bill = np.zeros(48) # prix de vente de l'électricité
         self.load= np.zeros(48) # chargement de la batterie (li)
+        self.penalty=np.zeros(48)
+        self.grid_relative_load=np.zeros(48)
         self.battery_stock = np.zeros(49) #a(t)
         self.capacity = 100
         self.pmax = 100
@@ -45,9 +47,9 @@ class Player:
         if derive_prix<0 and time<40:
             return p_battery_charge*self.imbalance["purchase_cover"][time-1]
         
-        return p_battery_discharge
-            
-        
+        return p_battery_discharge 
+        return 0
+
     def update_battery_stock(self,time,load):
         
         #If the battery isn't enough powerful, the battery load is set to the battery maximum power.
@@ -81,7 +83,7 @@ class Player:
         
         return self.load[time]
     
-    def observe(self, t, demand, price, imbalance):
+    def observe(self, t, demand, price, imbalance,grid_relative_load):
         self.demand.append(demand)
         
         self.prices["purchase"].append(price["purchase"])
@@ -90,10 +92,14 @@ class Player:
         self.imbalance["purchase_cover"].append(imbalance["purchase_cover"])
         self.imbalance["sale_cover"].append(imbalance["sale_cover"])
         
+        self.grid_relative_load[t]=grid_relative_load
     
     def reset(self):
         self.load= np.zeros(48)
         self.bill = np.zeros(48)
+        
+        self.penalty=np.zeros(48)
+        self.grid_relative_load=np.zeros(48)
         
         last_bat = self.battery_stock[-1]
         self.battery_stock = np.zeros(49)
