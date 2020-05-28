@@ -24,7 +24,7 @@ class Player:
         # below is a simple example 
         
         if time==0 or time==1:
-            return self.pmax
+            return 0
         
         p_battery_discharge=-min(self.battery_stock[time]/self.dt,self.pmax)
         p_battery_charge=min((self.capacity-self.battery_stock[time])/self.dt,self.pmax)
