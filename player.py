@@ -34,20 +34,23 @@ class Player:
         purchase_limit=0.9
         if self.imbalance["purchase_cover"][time-1]>=purchase_limit and time<40: #il y'a plus d'offre que de demande
         #on rempli le plus possible la batterie
-            return p_battery_charge*self.imbalance["purchase_cover"][time-1]
+            return p_battery_charge*0.9
         
         if self.imbalance["purchase_cover"][time-1]<=1-purchase_limit: #il y'a moins d'offre que de demande
         #on vide le plus possible la batterie
-            return p_battery_discharge*self.imbalance["purchase_cover"][time-1]
-        
-        if time<=10:
-            return p_battery_charge
-        if derive_prix>0 and time<40:
             return p_battery_discharge*0.5
-        if derive_prix<0 and time<40:
-            return p_battery_charge*self.imbalance["purchase_cover"][time-1]
         
+        if 5>=time and time<=10:
+            return p_battery_charge/2        
+        if time>10 and time<=16:
+            return p_battery_discharge
+        if time>16 and time<38:
+            return p_battery_charge/10
+        if derive_prix>=38 :
+            return p_battery_discharge 
+                   
         return p_battery_discharge 
+        
         return 0
 
     def update_battery_stock(self,time,load):
